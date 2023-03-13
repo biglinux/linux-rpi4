@@ -10,7 +10,7 @@ _srcname=linux-${_commit}
 _kernelname=${pkgbase#linux}
 _desc="Raspberry Pi 4 64-bit kernel"
 pkgver=6.1.16
-pkgrel=1
+pkgrel=2
 arch=('aarch64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -33,9 +33,7 @@ md5sums=('40bc7797903c3730848cf1e692c9feb7'
          'ce6c81ad1ad1f8b333fd6077d47abdaf'
          '441ec084c47cddc53e592fb0cbce4edf'
          '367931fb54eb998b74f97a9b6a3438d9'
-         '7f7ddadea6f4a7d3017380cb83b95b5e')
-
-
+         'SKIP')
 
 prepare() {
   cd "${srcdir}/${_srcname}"
