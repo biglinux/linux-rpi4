@@ -53,6 +53,7 @@ jobs:
             mv linux-rpi4 pkgbuild
             cp -f logo_linux_clut224.ppm pkgbuild/logo_linux_clut224.ppm
             rm -r pkgbuild/.git
+            rm -r pkgbuild/.git*
           else
             cancel
           fi
