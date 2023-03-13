@@ -5,12 +5,12 @@
 # Maintainer: Ray Sherwin <slick517d@gmail.com>
 
 pkgbase=linux-rpi4
-_commit=e9e421392e6d0239e1892c29b382a67ef5728b7b
+_commit=02928eb7eb435c6ec86745dcbb6ff99992128149
 _srcname=linux-${_commit}
 _kernelname=${pkgbase#linux}
 _desc="Raspberry Pi 4 64-bit kernel"
-pkgver=5.15.91
-pkgrel=1
+pkgver=6.1.16
+pkgrel=2
 arch=('aarch64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -21,16 +21,18 @@ source=("https://github.com/raspberrypi/linux/archive/${_commit}.tar.gz"
         'linux.preset'
         '60-linux.hook'
         '90-linux.hook'
+        '0001-wifi-cfg80211-Partial-revert-wifi-cfg80211-Fix-use-after-free-for-wext.patch'
 #        'revert-revert_drm_atomic_helpers_remove_legacy_cursor_update_hacks.diff'
 #        'revert-revert_drm_vc4_hvs_defer_dlist_slots_deallocation.diff'
         'logo_linux_clut224.ppm'
 )
 
-md5sums=('09d80ec637975ba4762da4509260eae4'
-         '1a021df169357cfd524245769e5a4320'
+md5sums=('40bc7797903c3730848cf1e692c9feb7'
+         '59da511a0a67612d3d734ea9c9d49482'
          '86d4a35722b5410e3b29fc92dae15d4b'
          'ce6c81ad1ad1f8b333fd6077d47abdaf'
          '441ec084c47cddc53e592fb0cbce4edf'
+         '367931fb54eb998b74f97a9b6a3438d9'
          '7f7ddadea6f4a7d3017380cb83b95b5e')
 
 prepare() {
@@ -46,7 +48,8 @@ prepare() {
   # Revert gamma control commits until kms screen blanking is fixed
 #  patch -p1 < ../revert-revert_drm_atomic_helpers_remove_legacy_cursor_update_hacks.diff
 #  patch -p1 < ../revert-revert_drm_vc4_hvs_defer_dlist_slots_deallocation.diff
-
+  # Fix wifi
+  patch -Np1 -i "${srcdir}/0001-wifi-cfg80211-Partial-revert-wifi-cfg80211-Fix-use-after-free-for-wext.patch"
   # Add Manjaro Mascot for cpu core count at boot
   cp ../logo_linux_clut224.ppm drivers/video/logo/
 
