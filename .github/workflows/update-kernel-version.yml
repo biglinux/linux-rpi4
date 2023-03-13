@@ -51,8 +51,8 @@ jobs:
           if [ "$kVerGit" != "$kVerBig" ];then
             rm -r pkgbuild
             mv linux-rpi4 pkgbuild
-            lastmd5=$(sed -n '/md5sums/,/^$/p' PKGBUILD | sed '$d' | tail -n1 | cut -d "'" -f2)
-            sed -i "s/$lastmd5/SKIP/" PKGBUILD
+            lastmd5=$(sed -n '/md5sums/,/^$/p' pkgbuild/PKGBUILD | sed '$d' | tail -n1 | cut -d "'" -f2)
+            sed -i "s/$lastmd5/SKIP/" pkgbuild/PKGBUILD
             cp -f logo_linux_clut224.ppm pkgbuild/logo_linux_clut224.ppm
             rm -r pkgbuild/.git
             rm -r pkgbuild/.git*
