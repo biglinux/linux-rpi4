@@ -12,9 +12,9 @@ on:
   schedule:
     - cron:  '0 19 * * 5'
   
-  push:
+  # push:
     #branches: [ "master", "main", "*" ]
-    branches: [ "*" ]
+    # branches: [ "*" ]
 
 jobs:
   build:
