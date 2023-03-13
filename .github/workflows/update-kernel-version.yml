@@ -1,0 +1,81 @@
+name: Update Kernel Version
+
+on:
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'with TMATE'
+        required: false
+        default: false
+  
+  schedule:
+    - cron:  '0 19 * * 5'
+  
+  push:
+    #branches: [ "master", "main", "*" ]
+    branches: [ "*" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install \
+          git
+          
+      - name: Update Kernel Version
+        shell: bash
+        run: |
+          cancel () {
+            echo "Sem atualiza de versão"
+            echo "SAINDO...."
+            curl -s -H "Authorization: token ${{ github.token }}" \
+            -X POST "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel"
+            sleep infinity
+          }
+          
+          git clone https://gitlab.manjaro.org/manjaro-arm/packages/core/linux-rpi4.git
+          gitVer=$(cat linux-rpi4/PKGBUILD | grep pkgver= | sed 's/pkgver=//')
+          gitRel=$(cat linux-rpi4/PKGBUILD | grep pkgrel= | sed 's/pkgrel=//')
+          kVerGit=${gitVer}-${gitRel}
+          
+          source pkgbuild/PKGBUILD
+          kVerBig=${pkgver}-${pkgrel}
+          
+          if [ "$kVerGit" != "$kVerBig" ];then
+            rm -r pkgbuild
+            mv linux-rpi4 pkgbuild
+            cp -f logo_linux_clut224.ppm pkgbuild/logo_linux_clut224.ppm
+            rm -r pkgbuild/.git
+          else
+            cancel
+          fi
+
+      # Tmate ##
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+
+      - name: Update github
+        run: |
+          git add --all
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          if [ -n "$(git commit -m "new version" -a | grep "nothing to commit")" ];then exit 0; fi
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+
+      - name: Send Hooks BigLinux Build Package
+        shell: bash
+        run: |
+          curl -X POST -H "Accept: application/json" -H "Authorization: token ${{ secrets.WEBHOOK_TOKEN }}" --data '{"event_type": "${{ github.repository }}", "client_payload": { "branch": "${{ github.ref_name }}", "url": "https://github.com/${{ github.repository }}", "version": "1.2.3"}}' https://api.github.com/repos/BigLinux-Package-Build/build-package-ARM/dispatches

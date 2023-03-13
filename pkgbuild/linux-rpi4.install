@@ -1,0 +1,117 @@
+post_install () {
+  # Define root partitions partuuid
+  PART_DEV=`findmnt / -o source -n | cut -f1 -d"["`
+  PART_NAME=`echo $PART_DEV | cut -d "/" -f 3`
+  ROOT_PART=$(lsblk -p -o NAME,PARTUUID | grep "${PART_NAME}" | awk '{print $2}')
+  FSTYPE=$(lsblk -p -o NAME,FSTYPE | grep "${PART_NAME}" | awk '{print $2}')
+  
+  if [ -f /boot/cmdline.txt ]; then
+    echo "===> Remove unwanted data if exists from cmdline.txt..."
+    sed -i -e 's/snd_bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
+    sed -i -e 's/snd-bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
+    sed -i -e 's/snd_bcm2835.enable_headphones=. //g' /boot/cmdline.txt
+    sed -i -e 's/snd-bcm2835.enable_headphones=. //g' /boot/cmdline.txt
+# Added in case arguments to be removed are at the end of line
+    sed -i -e 's/ snd_bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
+    sed -i -e 's/ snd-bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
+    sed -i -e 's/ snd_bcm2835.enable_headphones=.//g' /boot/cmdline.txt
+    sed -i -e 's/ snd-bcm2835.enable_headphones=.//g' /boot/cmdline.txt
+    sed -i -e 's/[ ]\+/ /g' /boot/cmdline.txt
+    fi
+  if [ ! -f /boot/cmdline.txt ] && [[ "$FSTYPE" == "btrfs" ]]; then
+   echo "===> Installing default btrfs cmdline.txt /boot..."
+   echo "rootflags=subvol=@ rootfstype=btrfs root=PARTUUID=$ROOT_PART rw rootwait console=serial0,115200 console=tty3 selinux=0 quiet splash plymouth.ignore-serial-consoles smsc95xx.turbo_mode=N dwc_otg.lpm_enable=0 usbhid.mousepoll=8 audit=0" > /boot/cmdline.txt
+   fi
+  if [ ! -f /boot/cmdline.txt ] && [[ "$FSTYPE" == "ext4" ]]; then
+   echo "===> Installing default ext4 cmdline.txt /boot..."
+   echo "root=PARTUUID=$ROOT_PART rw rootwait console=serial0,115200 console=tty3 selinux=0 quiet splash plymouth.ignore-serial-consoles smsc95xx.turbo_mode=N dwc_otg.lpm_enable=0 usbhid.mousepoll=8 audit=0" > /boot/cmdline.txt
+   fi
+  if [ ! -f /boot/cmdline.txt ] && [[ "$FSTYPE" == "f2fs" ]]; then
+   echo "===> Installing default f2fs cmdline.txt /boot..."
+   echo "root=PARTUUID=$ROOT_PART rw rootwait console=serial0,115200 console=tty3 selinux=0 quiet splash plymouth.ignore-serial-consoles smsc95xx.turbo_mode=N dwc_otg.lpm_enable=0 usbhid.mousepoll=8 audit=0" > /boot/cmdline.txt
+   fi
+
+  if [ -f /boot/config.txt ]; then
+    echo "===> Keeping old config.txt file..."
+  else
+    echo "===> Installing default config.txt file to /boot/..."
+    echo "# See /boot/overlays/README for all available options" > /boot/config.txt
+    echo "" >> /boot/config.txt
+    echo "#gpu_mem=64" >> /boot/config.txt
+    echo "initramfs initramfs-linux.img followkernel" >> /boot/config.txt
+    echo "kernel=kernel8.img" >> /boot/config.txt
+    echo "arm_64bit=1" >> /boot/config.txt
+    echo "disable_overscan=1" >> /boot/config.txt
+    echo "dtparam=krnbt=on" >> /boot/config.txt
+    echo "" >> /boot/config.txt
+    echo "#enable sound" >> /boot/config.txt
+    echo "dtparam=audio=on" >> /boot/config.txt
+    echo "#hdmi_drive=2" >> /boot/config.txt
+    echo "" >> /boot/config.txt
+    echo "#enable vc4" >> /boot/config.txt
+    echo "dtoverlay=vc4-fkms-v3d" >> /boot/config.txt
+    echo "max_framebuffers=2"  >> /boot/config.txt
+    echo "disable_splash=1" >> /boot/config.txt
+    fi
+}
+
+post_upgrade () {
+  # Define root partitions partuuid
+  PART_DEV=`findmnt / -o source -n | cut -f1 -d"["`
+  PART_NAME=`echo $PART_DEV | cut -d "/" -f 3`
+  ROOT_PART=$(lsblk -p -o NAME,PARTUUID | grep "${PART_NAME}" | awk '{print $2}')
+  FSTYPE=$(lsblk -p -o NAME,FSTYPE | grep "${PART_NAME}" | awk '{print $2}')
+
+  if [ -f /boot/cmdline.txt ]; then
+    echo "===> Remove unwanted data if exists from cmdline.txt..."
+    sed -i -e 's/snd_bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
+    sed -i -e 's/snd-bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
+    sed -i -e 's/snd_bcm2835.enable_headphones=. //g' /boot/cmdline.txt
+    sed -i -e 's/snd-bcm2835.enable_headphones=. //g' /boot/cmdline.txt
+# Added in case arguments to be removed are at the end of line
+    sed -i -e 's/ snd_bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
+    sed -i -e 's/ snd-bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
+    sed -i -e 's/ snd_bcm2835.enable_headphones=.//g' /boot/cmdline.txt
+    sed -i -e 's/ snd-bcm2835.enable_headphones=.//g' /boot/cmdline.txt
+    sed -i -e 's/[ ]\+/ /g' /boot/cmdline.txt
+    fi
+  if [ ! -f /boot/cmdline.txt ] && [[ "$FSTYPE" == "btrfs" ]]; then
+   echo "===> Installing default btrfs cmdline.txt /boot..."
+   echo "rootflags=subvol=@ rootfstype=btrfs root=PARTUUID=$ROOT_PART rw rootwait console=serial0,115200 console=tty3 selinux=0 quiet splash plymouth.ignore-serial-consoles smsc95xx.turbo_mode=N dwc_otg.lpm_enable=0 usbhid.mousepoll=8 audit=0" > /boot/cmdline.txt
+   fi   
+  if [ ! -f /boot/cmdline.txt ] && [[ "$FSTYPE" == "ext4" ]]; then
+   echo "===> Installing default ext4 cmdline.txt /boot..."
+   echo "root=PARTUUID=$ROOT_PART rw rootwait console=serial0,115200 console=tty3 selinux=0 quiet splash plymouth.ignore-serial-consoles smsc95xx.turbo_mode=N dwc_otg.lpm_enable=0 usbhid.mousepoll=8 audit=0" > /boot/cmdline.txt
+   fi
+  if [ ! -f /boot/cmdline.txt ] && [[ "$FSTYPE" == "f2fs" ]]; then
+   echo "===> Installing default f2fs cmdline.txt /boot..."
+   echo "root=PARTUUID=$ROOT_PART rw rootwait console=serial0,115200 console=tty3 selinux=0 quiet splash plymouth.ignore-serial-consoles smsc95xx.turbo_mode=N dwc_otg.lpm_enable=0 usbhid.mousepoll=8 audit=0" > /boot/cmdline.txt
+   fi
+
+  if [ -f /boot/config.txt ]; then
+    echo "===> Keeping old config.txt file..."
+   else
+    echo "===> Installing default config.txt to /boot/..."
+    echo "# See /boot/overlays/README for all available options" > /boot/config.txt
+    echo "" >> /boot/config.txt
+    echo "#gpu_mem=64" >> /boot/config.txt
+    echo "initramfs initramfs-linux.img followkernel" >> /boot/config.txt
+    echo "kernel=kernel8.img" >> /boot/config.txt
+    echo "arm_64bit=1" >> /boot/config.txt
+    echo "disable_overscan=1" >> /boot/config.txt
+    echo "dtparam=krnbt=on" >> /boot/config.txt
+    echo "" >> /boot/config.txt
+    echo "#enable sound" >> /boot/config.txt
+    echo "dtparam=audio=on" >> /boot/config.txt
+    echo "#hdmi_drive=2" >> /boot/config.txt
+    echo "" >> /boot/config.txt
+    echo "#enable vc4" >> /boot/config.txt
+    echo "dtoverlay=vc4-fkms-v3d" >> /boot/config.txt
+    echo "max_framebuffers=2" >> /boot/config.txt
+    echo "disable_splash=1" >> /boot/config.txt
+    fi
+}
+
+post_remove () {
+  rm -f boot/initramfs-linux.img
+}
