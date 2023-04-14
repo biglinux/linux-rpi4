@@ -5,19 +5,20 @@ post_install () {
   ROOT_PART=$(lsblk -p -o NAME,PARTUUID | grep "${PART_NAME}" | awk '{print $2}')
   FSTYPE=$(lsblk -p -o NAME,FSTYPE | grep "${PART_NAME}" | awk '{print $2}')
   
-  if [ -f /boot/cmdline.txt ]; then
-    echo "===> Remove unwanted data if exists from cmdline.txt..."
-    sed -i -e 's/snd_bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
-    sed -i -e 's/snd-bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
-    sed -i -e 's/snd_bcm2835.enable_headphones=. //g' /boot/cmdline.txt
-    sed -i -e 's/snd-bcm2835.enable_headphones=. //g' /boot/cmdline.txt
+# Disabled as headphones not showing up again & compat_alsa is obsolete
+#  if [ -f /boot/cmdline.txt ]; then
+#    echo "===> Remove unwanted data if exists from cmdline.txt..."
+#    sed -i -e 's/snd_bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
+#    sed -i -e 's/snd-bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
+#    sed -i -e 's/snd_bcm2835.enable_headphones=. //g' /boot/cmdline.txt
+#    sed -i -e 's/snd-bcm2835.enable_headphones=. //g' /boot/cmdline.txt
 # Added in case arguments to be removed are at the end of line
-    sed -i -e 's/ snd_bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
-    sed -i -e 's/ snd-bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
-    sed -i -e 's/ snd_bcm2835.enable_headphones=.//g' /boot/cmdline.txt
-    sed -i -e 's/ snd-bcm2835.enable_headphones=.//g' /boot/cmdline.txt
-    sed -i -e 's/[ ]\+/ /g' /boot/cmdline.txt
-    fi
+#    sed -i -e 's/ snd_bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
+#    sed -i -e 's/ snd-bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
+#    sed -i -e 's/ snd_bcm2835.enable_headphones=.//g' /boot/cmdline.txt
+#    sed -i -e 's/ snd-bcm2835.enable_headphones=.//g' /boot/cmdline.txt
+#    sed -i -e 's/[ ]\+/ /g' /boot/cmdline.txt
+#    fi
   if [ ! -f /boot/cmdline.txt ] && [[ "$FSTYPE" == "btrfs" ]]; then
    echo "===> Installing default btrfs cmdline.txt /boot..."
    echo "rootflags=subvol=@ rootfstype=btrfs root=PARTUUID=$ROOT_PART rw rootwait console=serial0,115200 console=tty3 selinux=0 quiet splash plymouth.ignore-serial-consoles smsc95xx.turbo_mode=N dwc_otg.lpm_enable=0 usbhid.mousepoll=8 audit=0" > /boot/cmdline.txt
@@ -62,19 +63,20 @@ post_upgrade () {
   ROOT_PART=$(lsblk -p -o NAME,PARTUUID | grep "${PART_NAME}" | awk '{print $2}')
   FSTYPE=$(lsblk -p -o NAME,FSTYPE | grep "${PART_NAME}" | awk '{print $2}')
 
-  if [ -f /boot/cmdline.txt ]; then
-    echo "===> Remove unwanted data if exists from cmdline.txt..."
-    sed -i -e 's/snd_bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
-    sed -i -e 's/snd-bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
-    sed -i -e 's/snd_bcm2835.enable_headphones=. //g' /boot/cmdline.txt
-    sed -i -e 's/snd-bcm2835.enable_headphones=. //g' /boot/cmdline.txt
+# Disabled as headphones not showing up again & compat_alsa is obsolete
+#  if [ -f /boot/cmdline.txt ]; then
+#    echo "===> Remove unwanted data if exists from cmdline.txt..."
+#    sed -i -e 's/snd_bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
+#    sed -i -e 's/snd-bcm2835.enable_compat_alsa=. //g' /boot/cmdline.txt
+#    sed -i -e 's/snd_bcm2835.enable_headphones=. //g' /boot/cmdline.txt
+#    sed -i -e 's/snd-bcm2835.enable_headphones=. //g' /boot/cmdline.txt
 # Added in case arguments to be removed are at the end of line
-    sed -i -e 's/ snd_bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
-    sed -i -e 's/ snd-bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
-    sed -i -e 's/ snd_bcm2835.enable_headphones=.//g' /boot/cmdline.txt
-    sed -i -e 's/ snd-bcm2835.enable_headphones=.//g' /boot/cmdline.txt
-    sed -i -e 's/[ ]\+/ /g' /boot/cmdline.txt
-    fi
+#    sed -i -e 's/ snd_bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
+#    sed -i -e 's/ snd-bcm2835.enable_compat_alsa=.//g' /boot/cmdline.txt
+#    sed -i -e 's/ snd_bcm2835.enable_headphones=.//g' /boot/cmdline.txt
+#    sed -i -e 's/ snd-bcm2835.enable_headphones=.//g' /boot/cmdline.txt
+#    sed -i -e 's/[ ]\+/ /g' /boot/cmdline.txt
+#    fi
   if [ ! -f /boot/cmdline.txt ] && [[ "$FSTYPE" == "btrfs" ]]; then
    echo "===> Installing default btrfs cmdline.txt /boot..."
    echo "rootflags=subvol=@ rootfstype=btrfs root=PARTUUID=$ROOT_PART rw rootwait console=serial0,115200 console=tty3 selinux=0 quiet splash plymouth.ignore-serial-consoles smsc95xx.turbo_mode=N dwc_otg.lpm_enable=0 usbhid.mousepoll=8 audit=0" > /boot/cmdline.txt
