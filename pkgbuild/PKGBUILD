@@ -4,11 +4,11 @@
 # Maintainer: Ray Sherwin <slick517d@gmail.com>
 
 pkgbase=linux-rpi4
-_commit=fad58933544bb2a7b7db92847c25c79a83171fa6
+_commit=2442399ad0ceff0abce7983df8782859f806c744
 _srcname=linux-${_commit}
 _kernelname=${pkgbase#linux}
 _desc="Raspberry Pi 4 64-bit kernel"
-pkgver=6.1.54
+pkgver=6.1.55
 pkgrel=1
 arch=('aarch64')
 url="http://www.kernel.org/"
@@ -23,11 +23,11 @@ source=("https://github.com/raspberrypi/linux/archive/${_commit}.tar.gz"
         'logo_linux_clut224.ppm'
 )
 
-md5sums=('42bcec0ed92931806cc4242d45df6f8b'
-         '89dc374a1004255dc7310a9e80a673b6'
-         '86d4a35722b5410e3b29fc92dae15d4b'
+md5sums=('3f9ed3637044a08c3c279ec7f2237d62'
+         '9e3846d83e4df2ac35ec80c0d6b266f3'
+         '6a67652555bce868772d6832effff26e'
          'ce6c81ad1ad1f8b333fd6077d47abdaf'
-         '441ec084c47cddc53e592fb0cbce4edf'
+         '0a98f67d3354d5a2f9fe1a62a0c0839c'
          'SKIP')
 
 prepare() {
@@ -42,7 +42,6 @@ prepare() {
 
   # Add Manjaro Mascot for cpu core count at boot
   cp ../logo_linux_clut224.ppm drivers/video/logo/
-
 }
 
 build() {
@@ -77,8 +76,8 @@ build() {
 
 _package() {
   pkgdesc="The Linux Kernel and modules - ${_desc}"
-#  depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=0.7' 'firmware-raspberrypi')
-  depends=('coreutils' 'linux-firmware' 'kmod' 'initramfs' 'firmware-raspberrypi')
+  depends=('coreutils' 'linux-firmware' 'kmod' 'initramfs'
+           'firmware-raspberrypi' 'rpi-overlays')
   optdepends=('wireless-regdb: to set the correct wireless channels of your country')
   provides=('kernel26' "linux=${pkgver}")
   conflicts=('kernel26' 'linux' 'uboot-raspberrypi')
@@ -94,8 +93,10 @@ _package() {
   _basekernel=${_kernver%%-*}
   _basekernel=${_basekernel%.*}
 
-  mkdir -p "${pkgdir}"/{boot/overlays,usr/lib/modules}
-  make INSTALL_MOD_PATH="${pkgdir}/usr" modules_install
+# Temp disable
+#  mkdir -p "${pkgdir}"/{boot/overlays,usr/lib/modules}
+   mkdir -p "${pkgdir}"/{boot,usr/lib/modules}
+   make INSTALL_MOD_PATH="${pkgdir}/usr" modules_install
 
   cp arch/$KARCH/boot/dts/broadcom/bcm2710-rpi-cm3.dtb "${pkgdir}/boot"
   cp arch/$KARCH/boot/dts/broadcom/bcm2711-rpi-cm4.dtb "${pkgdir}/boot"
@@ -105,8 +106,6 @@ _package() {
   cp arch/$KARCH/boot/dts/broadcom/bcm2710-rpi-3-b.dtb "${pkgdir}/boot"
   cp arch/$KARCH/boot/dts/broadcom/bcm2710-rpi-zero-2.dtb "${pkgdir}/boot"
   cp arch/$KARCH/boot/Image "${pkgdir}/boot/kernel8.img"
-  cp arch/$KARCH/boot/dts/overlays/*.dtb* "${pkgdir}/boot/overlays"
-  cp arch/$KARCH/boot/dts/overlays/README "${pkgdir}/boot/overlays"
 
   # make room for external modules
   local _extramodules="extramodules-${_basekernel}${_kernelname}"
