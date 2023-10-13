@@ -24,57 +24,62 @@ post_install () {
     sed -i '/kernel=kernel8.img/I d' /boot/config.txt
    else
     echo "===> Installing default config.txt to /boot/..."
-    echo "# See /boot/overlays/README for all available options" > /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Uncomment some or all of these to enable optional Hardware interfaces" >> /boot/config.txt
-    echo "#dtparam=i2c_arm=on" >> /boot/config.txt
-    echo "#dtparam=i2s=on" >> /boot/config.txt
-    echo "#dtparam=spi=on" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Enable sound" >> /boot/config.txt
-    echo "dtparam=audio=on" >> /boot/config.txt
-    echo "# Uncomment if no sound thru hdmi" >> /boot/config.txt
-    echo "#hdmi_drive=2" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# See /boot/overlays/README for all available options" > /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Auto load overlays for detected cameras" >> /boot/config.txt
-    echo "camera_auto_detect=1" >> /boot/config.txt
-    echo "# Auto load overlays for detected DSI displays" >> /boot/config.txt
-    echo "display_auto_detect=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Auto load initramfs files if found" >> /boot/config.txt
-    echo "auto_initramfs=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Enable DRM VC4 V3D driver" >> /boot/config.txt
-    echo "dtoverlay=vc4-kms-v3d" >> /boot/config.txt
-    echo "max_framebuffers=2" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Don't have the firmware create an initial video= setting in cmdline.txt" >> /boot/config.txt
-    echo "# Use the kernel default instead" >> /boot/config.txt
-    echo "disable_fw_kms_setup=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Disable compensation for displays with overscan" >> /boot/config.txt
-    echo "disable_overscan=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Disable rainbow screen at boot" >> /boot/config.txt
-    echo "disable_splash=1" >> /boot/config.txt
-    echo "# Run in 64bit mode" >> /boot/config.txt
-    echo "arm_64bit=1" >> /boot/config.txt
-    echo "# Run as fast as the firmware / board allows" >> /boot/config.txt
-    echo "arm_boost=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# RPi 5B/4B/400 ONLY" >> /boot/config.txt
-    echo "# For 4k content @ 60 Hz refresh rate, uncomment hdmi_enable_4kp60=1" >> /boot/config.txt
-    echo "#hdmi_enable_4kp60=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "[cm4]" >> /boot/config.txt
-    echo "# Enable host mode on the 2711 built-in XHCI USB controller" >> /boot/config.txt
-    echo "# This line should be remoed if the legacy DWC2 controller is required" >> /boot/config.txt
-    echo "otg_mode=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "[all]" >> /boot/config.txt
+    echo "# See /boot/overlays/README for all available options
+
+# Uncomment some or all of these to enable optional Hardware interfaces
+#dtparam=i2c_arm=on
+#dtparam=i2s=on
+#dtparam=spi=on
+
+# Run in 64bit mode
+arm_64bit=1
+
+# Auto load correct initramfs files if found
+auto_initramfs=1
+
+# Run as fast as the firmware/board allows
+arm_boost=1
+
+# Disable compensation for displays with overscan
+disable_overscan=1
+
+# Enable sound
+dtparam=audio=on
+# Uncomment if no sound thru hdmi
+#hdmi_drive=2
+
+# Auto load overlays for detected cameras
+camera_auto_detect=1
+# Auto load overlays for detected DSI displays
+display_auto_detect=1
+
+# Enable DRM VC4 V3D driver
+dtoverlay=vc4-kms-v3d
+# For pi4's and above boards uncomment next line & Comment out above line
+#dtoverlay=vc4-kms-v3d,cma-512
+max_framebuffers=2
+
+# Don't have the firmware create an initial video= setting in cmdline.txt
+# Use the kernel default instead
+#disable_fw_kms_setup=1
+
+# Disable rainbow screen at boot
+disable_splash=1
+
+# RPi 5B/4B/400 ONLY
+# For 4k content @ 60 Hz refresh rate, uncomment hdmi_enable_4kp60=1
+#hdmi_enable_4kp60=1
+# If video breaks with hdmi_enable_4kp60=1 uncomment
+#force_turbo=1
+
+
+[cm4]
+# Enable host mode on the 2711 built-in XHCI USB controller
+# This line should be remoed if the legacy DWC2 controller is required
+otg_mode=1
+
+
+[all]" > /boot/config.txt
     fi
 }
 
@@ -104,57 +109,62 @@ post_upgrade () {
     sed -i '/kernel=kernel8.img/I d' /boot/config.txt
    else
     echo "===> Installing default config.txt to /boot/..."
-    echo "# See /boot/overlays/README for all available options" > /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Uncomment some or all of these to enable optional Hardware interfaces" >> /boot/config.txt
-    echo "#dtparam=i2c_arm=on" >> /boot/config.txt
-    echo "#dtparam=i2s=on" >> /boot/config.txt
-    echo "#dtparam=spi=on" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Enable sound" >> /boot/config.txt
-    echo "dtparam=audio=on" >> /boot/config.txt
-    echo "# Uncomment if no sound thru hdmi" >> /boot/config.txt
-    echo "#hdmi_drive=2" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# See /boot/overlays/README for all available options" > /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Auto load overlays for detected cameras" >> /boot/config.txt
-    echo "camera_auto_detect=1" >> /boot/config.txt
-    echo "# Auto load overlays for detected DSI displays" >> /boot/config.txt
-    echo "display_auto_detect=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Auto load initramfs files if found" >> /boot/config.txt
-    echo "auto_initramfs=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Enable DRM VC4 V3D driver" >> /boot/config.txt
-    echo "dtoverlay=vc4-kms-v3d" >> /boot/config.txt
-    echo "max_framebuffers=2" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Don't have the firmware create an initial video= setting in cmdline.txt" >> /boot/config.txt
-    echo "# Use the kernel default instead" >> /boot/config.txt
-    echo "disable_fw_kms_setup=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Disable compensation for displays with overscan" >> /boot/config.txt
-    echo "disable_overscan=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# Disable rainbow screen at boot" >> /boot/config.txt
-    echo "disable_splash=1" >> /boot/config.txt
-    echo "# Run in 64bit mode" >> /boot/config.txt
-    echo "arm_64bit=1" >> /boot/config.txt
-    echo "# Run as fast as the firmware / board allows" >> /boot/config.txt
-    echo "arm_boost=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "# RPi 5B/4B/400 ONLY" >> /boot/config.txt
-    echo "# For 4k content @ 60 Hz refresh rate, uncomment hdmi_enable_4kp60=1" >> /boot/config.txt
-    echo "#hdmi_enable_4kp60=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "[cm4]" >> /boot/config.txt
-    echo "# Enable host mode on the 2711 built-in XHCI USB controller" >> /boot/config.txt
-    echo "# This line should be remoed if the legacy DWC2 controller is required" >> /boot/config.txt
-    echo "otg_mode=1" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "" >> /boot/config.txt
-    echo "[all]" >> /boot/config.txt
+    echo "# See /boot/overlays/README for all available options
+
+# Uncomment some or all of these to enable optional Hardware interfaces
+#dtparam=i2c_arm=on
+#dtparam=i2s=on
+#dtparam=spi=on
+
+# Run in 64bit mode
+arm_64bit=1
+
+# Auto load correct initramfs files if found
+auto_initramfs=1
+
+# Run as fast as the firmware/board allows
+arm_boost=1
+
+# Disable compensation for displays with overscan
+disable_overscan=1
+
+# Enable sound
+dtparam=audio=on
+# Uncomment if no sound thru hdmi
+#hdmi_drive=2
+
+# Auto load overlays for detected cameras
+camera_auto_detect=1
+# Auto load overlays for detected DSI displays
+display_auto_detect=1
+
+# Enable DRM VC4 V3D driver
+dtoverlay=vc4-kms-v3d
+# For pi4's and above boards uncomment next line & Comment out above line
+#dtoverlay=vc4-kms-v3d,cma-512
+max_framebuffers=2
+
+# Don't have the firmware create an initial video= setting in cmdline.txt
+# Use the kernel default instead
+#disable_fw_kms_setup=1
+
+# Disable rainbow screen at boot
+disable_splash=1
+
+# RPi 5B/4B/400 ONLY
+# For 4k content @ 60 Hz refresh rate, uncomment hdmi_enable_4kp60=1
+#hdmi_enable_4kp60=1
+# If video breaks with hdmi_enable_4kp60=1 uncomment
+#force_turbo=1
+
+
+[cm4]
+# Enable host mode on the 2711 built-in XHCI USB controller
+# This line should be remoed if the legacy DWC2 controller is required
+otg_mode=1
+
+
+[all]" > /boot/config.txt
     fi
 }
 
