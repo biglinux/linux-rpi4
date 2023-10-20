@@ -169,5 +169,5 @@ otg_mode=1
 }
 
 post_remove () {
-  rm -f boot/initramfs.img
+  rm -f boot/initramfs8
 }
