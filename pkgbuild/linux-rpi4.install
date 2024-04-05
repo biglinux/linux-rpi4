@@ -19,9 +19,9 @@ post_install () {
    fi
 
   if [ -f /boot/config.txt ]; then
-    echo "===> Modifing config.txt to load for pi3/4/5 kernels"
+#    echo "===> Modifing config.txt to load for pi3/4/5 kernels"
     sed -i 's\initramfs initramfs-linux.img followkernel\auto_initramfs=1\g' /boot/config.txt
-    sed -i '/kernel=kernel8.img/I d' /boot/config.txt
+#    sed -i '/kernel=kernel8.img/I d' /boot/config.txt
    else
     echo "===> Installing default config.txt to /boot/..."
     echo "# See /boot/overlays/README for all available options
@@ -104,9 +104,9 @@ post_upgrade () {
    fi
 
   if [ -f /boot/config.txt ]; then
-    echo "===> Modifing config.txt to load for pi3/4/5 kernels"
+#    echo "===> Modifing config.txt to load for pi3/4/5 kernels"
     sed -i 's\initramfs initramfs-linux.img followkernel\auto_initramfs=1\g' /boot/config.txt
-    sed -i '/kernel=kernel8.img/I d' /boot/config.txt
+#    sed -i '/kernel=kernel8.img/I d' /boot/config.txt
    else
     echo "===> Installing default config.txt to /boot/..."
     echo "# See /boot/overlays/README for all available options
