@@ -4,17 +4,18 @@
 # Maintainer: Ray Sherwin <slick517d@gmail.com>
 
 pkgbase=linux-rpi4
-_commit=f54dbddefe179433c73ad6611ada5b25d452ce05
+_commit=d2813c02131b9ddf938277f4123da7ccbd113ea7
 _srcname=linux-${_commit}
 _kernelname=${pkgbase#linux}
 _desc="Raspberry Pi 4 64-bit kernel"
-pkgver=6.6.34
+pkgver=6.6.35
 pkgrel=1
 arch=('aarch64')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'git')
 options=('!strip')
+
 source=("https://github.com/raspberrypi/linux/archive/${_commit}.tar.gz"
         'config-diff-manjaro'
         'linux.preset'
@@ -22,7 +23,7 @@ source=("https://github.com/raspberrypi/linux/archive/${_commit}.tar.gz"
         '90-linux.hook'
         'logo_linux_clut224.ppm')
 
-md5sums=('e19d5e3ca39b064e8d465b8ee3f84f87'
+md5sums=('a3c709eb6fa6b2d1265d7cef092ad452'
          '2c7cbe27b6985bf4ad51cbee34fb581e'
          '38c88d6d573cef3309960a6162b7d3c7'
          'ce6c81ad1ad1f8b333fd6077d47abdaf'
