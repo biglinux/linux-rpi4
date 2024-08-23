@@ -4,11 +4,11 @@
 # Maintainer: Ray Sherwin <slick517d@gmail.com>
 
 pkgbase=linux-rpi4
-_commit=bfaaf1b9fabb6922f31cc4588e2380b229fcc446
+_commit=ba0f2212e0e100ee16bdde76b7efca6bb8ee9446
 _srcname=linux-${_commit}
 _kernelname=${pkgbase#linux}
 _desc="Raspberry Pi 4 64-bit kernel"
-pkgver=6.6.45
+pkgver=6.6.47
 pkgrel=1
 arch=('aarch64')
 url="http://www.kernel.org/"
@@ -18,15 +18,13 @@ options=('!strip')
 source=("https://github.com/raspberrypi/linux/archive/${_commit}.tar.gz"
         'config-diff-manjaro'
         'linux.preset'
-        '60-linux.hook'
-        '90-linux.hook'
+#        '60-linux.hook'
+#        '90-linux.hook'
         'logo_linux_clut224.ppm')
 
-md5sums=('c7872833606463c42408ce07cabea19b'
+md5sums=('d9086a6018ff7f3c94cd037862c3d26f'
          '2c7cbe27b6985bf4ad51cbee34fb581e'
          '38c88d6d573cef3309960a6162b7d3c7'
-         'ce6c81ad1ad1f8b333fd6077d47abdaf'
-         '0a98f67d3354d5a2f9fe1a62a0c0839c'
          'SKIP')
 
 prepare() {
@@ -119,7 +117,7 @@ _package() {
   rm "${pkgdir}"/usr/lib/modules/${_kernver}/build
 
   # now we call depmod...
-  depmod -b "${pkgdir}/usr" -F System.map "${_kernver}"
+#  depmod -b "${pkgdir}/usr" -F System.map "${_kernver}"
 
   # sed expression for following substitutions
   local _subst="
@@ -133,10 +131,14 @@ _package() {
     install -Dm644 /dev/stdin "${pkgdir}/etc/mkinitcpio.d/${pkgbase}.preset"
 
   # install pacman hooks
-  sed "${_subst}" ../60-linux.hook |
-    install -Dm644 /dev/stdin "${pkgdir}/usr/share/libalpm/hooks/60-${pkgbase}.hook"
-  sed "${_subst}" ../90-linux.hook |
-    install -Dm644 /dev/stdin "${pkgdir}/usr/share/libalpm/hooks/90-${pkgbase}.hook"
+#  sed "${_subst}" ../60-linux.hook |
+#    install -Dm644 /dev/stdin "${pkgdir}/usr/share/libalpm/hooks/60-${pkgbase}.hook"
+#  sed "${_subst}" ../90-linux.hook |
+#    install -Dm644 /dev/stdin "${pkgdir}/usr/share/libalpm/hooks/90-${pkgbase}.hook"
+  # rather than use another hook (90-linux.hook) rely on mkinitcpio's 90-mkinitcpio-install.hook
+  # which avoids a double run of mkinitcpio that can occur
+  install -d "${pkgdir}/usr/lib/firmware/"
+  echo "dummy file to trigger mkinitcpio to run" > "${pkgdir}/usr/lib/firmware/${_kernver}"
 }
 
 _package-headers() {
