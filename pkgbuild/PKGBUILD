@@ -4,11 +4,11 @@
 # Maintainer: Ray Sherwin <slick517d@gmail.com>
 
 pkgbase=linux-rpi4
-_commit=ba0f2212e0e100ee16bdde76b7efca6bb8ee9446
+_commit=8c9ca647449ba9df7e3b300c480242f9b5bdd867
 _srcname=linux-${_commit}
 _kernelname=${pkgbase#linux}
 _desc="Raspberry Pi 4 64-bit kernel"
-pkgver=6.6.47
+pkgver=6.6.51
 pkgrel=1
 arch=('aarch64')
 url="http://www.kernel.org/"
@@ -18,11 +18,9 @@ options=('!strip')
 source=("https://github.com/raspberrypi/linux/archive/${_commit}.tar.gz"
         'config-diff-manjaro'
         'linux.preset'
-#        '60-linux.hook'
-#        '90-linux.hook'
         'logo_linux_clut224.ppm')
 
-md5sums=('d9086a6018ff7f3c94cd037862c3d26f'
+md5sums=('3fff2f07355758daf1800eec29168e00'
          '2c7cbe27b6985bf4ad51cbee34fb581e'
          '38c88d6d573cef3309960a6162b7d3c7'
          'SKIP')
@@ -77,8 +75,8 @@ _package() {
   depends=('coreutils' 'kmod' 'initramfs' 'firmware-raspberrypi' 'raspberrypi-bootloader')
   optdepends=('wireless-regdb: Set the correct wireless channels of your country'
               'linux-firmware: Extra firmware not provided by RPi or kernel')
-  provides=('kernel26' "linux=${pkgver}")
-  conflicts=('kernel26' 'linux' 'uboot-raspberrypi')
+  provides=("linux=${pkgver}")
+  conflicts=('linux-rpi4-mainline' 'linux-rpi4-rc' 'uboot-raspberrypi')
   install=${pkgname}.install
   replaces=('linux-raspberrypi-latest')
 
@@ -106,7 +104,7 @@ _package() {
   cp arch/$KARCH/boot/Image.gz "${pkgdir}/boot/kernel8.img"
 
   # make room for external modules
-  local _extramodules="extramodules-${_basekernel}${_kernelname}"
+  local _extramodules="extramodules-${_basekernel}-${_kernelname}"
   ln -s "../${_extramodules}" "${pkgdir}/usr/lib/modules/${_kernver}/extramodules"
 
   # add real version for building modules and running depmod from hook
@@ -117,7 +115,7 @@ _package() {
   rm "${pkgdir}"/usr/lib/modules/${_kernver}/build
 
   # now we call depmod...
-#  depmod -b "${pkgdir}/usr" -F System.map "${_kernver}"
+  depmod -b "${pkgdir}/usr" -F System.map "${_kernver}"
 
   # sed expression for following substitutions
   local _subst="
@@ -130,11 +128,6 @@ _package() {
   sed "${_subst}" ../linux.preset |
     install -Dm644 /dev/stdin "${pkgdir}/etc/mkinitcpio.d/${pkgbase}.preset"
 
-  # install pacman hooks
-#  sed "${_subst}" ../60-linux.hook |
-#    install -Dm644 /dev/stdin "${pkgdir}/usr/share/libalpm/hooks/60-${pkgbase}.hook"
-#  sed "${_subst}" ../90-linux.hook |
-#    install -Dm644 /dev/stdin "${pkgdir}/usr/share/libalpm/hooks/90-${pkgbase}.hook"
   # rather than use another hook (90-linux.hook) rely on mkinitcpio's 90-mkinitcpio-install.hook
   # which avoids a double run of mkinitcpio that can occur
   install -d "${pkgdir}/usr/lib/firmware/"
@@ -144,7 +137,7 @@ _package() {
 _package-headers() {
   pkgdesc="Header files and scripts for building modules for linux kernel - ${_desc}"
   provides=("linux-headers=${pkgver}")
-  conflicts=('linux-headers')
+  conflicts=('linux-rpi4-mainline-headers' 'linux-rpi4-rc-headers')
   replaces=('linux-raspberrypi-latest-headers')
 
   cd ${_srcname}
