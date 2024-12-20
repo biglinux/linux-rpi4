@@ -1,3 +1,14 @@
+_message() {
+  cat <<END
+
+>>> Sched_ext has been enabled in this kernel.
+    If you want to test it see this link to get started:
+    
+    https://forum.manjaro.org/t/raspberry-pi-kernels-2-0/84885/1145
+
+END
+}
+
 post_install () {
   # Define root partitions partuuid
   PART_DEV=`findmnt / -o source -n | cut -f1 -d"["`
@@ -78,9 +89,13 @@ disable_splash=1
 # This line should be remoed if the legacy DWC2 controller is required
 otg_mode=1
 
+[cm5]
+dtoverlay=dwc2,dr_mode=host
 
 [all]" > /boot/config.txt
     fi
+
+_message
 }
 
 post_upgrade () {
@@ -168,6 +183,8 @@ dtoverlay=dwc2,dr_mode=host
 
 [all]" > /boot/config.txt
     fi
+
+_message
 }
 
 post_remove () {

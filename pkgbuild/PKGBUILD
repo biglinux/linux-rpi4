@@ -4,31 +4,35 @@
 # Maintainer: Ray Sherwin <slick517d@gmail.com>
 
 pkgbase=linux-rpi4
-_commit=3f11c402c97dbefd17632b8e11ea738c09117c0a
+_commit=49679ed862ff4c05a3710882936182aa86354c13
 _srcname=linux-${_commit}
 _kernelname=${pkgbase#linux}
 _desc="Raspberry Pi 4 64-bit kernel"
-pkgver=6.6.60
+pkgver=6.12.6
 pkgrel=1
 arch=('aarch64')
 url="http://www.kernel.org/"
 license=('GPL2')
-makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'git')
+makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'git' 'pahole' 'zstd')
 options=('!strip')
 source=("https://github.com/raspberrypi/linux/archive/${_commit}.tar.gz"
-        'config-diff-manjaro'
         'linux.preset'
-        'logo_linux_clut224.ppm')
+        'logo_linux_clut224.ppm'
+        'config-diff-manjaro'
+)
 
-md5sums=('bb2c0947832865acd0ac34253ed52089'
-         '6060d79aa8e8bc8581da772b47bb8c1e'
+md5sums=('76a38a5d92035db224057ccb5feaa6c9'
          '38c88d6d573cef3309960a6162b7d3c7'
+         '7f7ddadea6f4a7d3017380cb83b95b5e'
          'SKIP')
 
 prepare() {
   cd "${srcdir}/${_srcname}"
   make bcm2711_defconfig
   cat ../config-diff-manjaro >> .config
+
+  ### Enable SCHED_EXT
+        scripts/config -e SCHED_CLASS_EXT
 
   # add pkgrel to extraversion
   sed -ri "s|^(EXTRAVERSION =)(.*)|\1 \2-${pkgrel}|" Makefile
@@ -64,22 +68,23 @@ build() {
   #msg "Stopping build"
   #return 1
   ####################
-
   #yes "" | make config
 
+  # LTO kernel compile
+  # make LLVM=1 LLVM_IAS=1 ${MAKEFLAGS} Image modules dtbs
+
   make ${MAKEFLAGS} Image.gz modules dtbs
+  make -C tools/bpf/bpftool vmlinux.h feature-clang-bpf-co-re=1  
 }
 
 _package() {
   pkgdesc="The Linux Kernel and modules - ${_desc}"
-  depends=('coreutils' 'kmod' 'initramfs' 'firmware-raspberrypi' 'raspberrypi-bootloader')
+  depends=('coreutils' 'kmod' 'initramfs' 'firmware-raspberrypi' 'raspberrypi-bootloader' 'scx-scheds')
   optdepends=('wireless-regdb: Set the correct wireless channels of your country'
               'linux-firmware: Extra firmware not provided by RPi or kernel')
   provides=("linux=${pkgver}")
-  conflicts=('linux-rpi4-mainline' 'linux-rpi4-rc' 'uboot-raspberrypi')
+  conflicts=('linux-rpi4-mainline' 'linux-rpi4-rc')
   install=${pkgname}.install
-  replaces=('linux-raspberrypi-latest')
-
   cd "${srcdir}/${_srcname}"
 
   KARCH=arm64
@@ -90,7 +95,8 @@ _package() {
   _basekernel=${_basekernel%.*}
 
   mkdir -p "${pkgdir}"/{boot,usr/lib/modules}
-  make INSTALL_MOD_PATH="${pkgdir}/usr" modules_install
+#  make INSTALL_MOD_PATH="${pkgdir}/usr" modules_install
+  ZSTD_CLEVEL=19 make INSTALL_MOD_PATH="$pkgdir/usr" INSTALL_MOD_STRIP=1 modules_install
 
   cp arch/$KARCH/boot/dts/broadcom/bcm2710-rpi-cm3.dtb "${pkgdir}/boot"
   cp arch/$KARCH/boot/dts/broadcom/bcm2711-rpi-cm4.dtb "${pkgdir}/boot"
@@ -104,14 +110,14 @@ _package() {
   cp arch/$KARCH/boot/Image.gz "${pkgdir}/boot/kernel8.img"
 
   # make room for external modules
-  local _extramodules="extramodules-${_basekernel}-${_kernelname}"
+  local _extramodules="extramodules-${_basekernel}${_kernelname}"
   ln -s "../${_extramodules}" "${pkgdir}/usr/lib/modules/${_kernver}/extramodules"
 
   # add real version for building modules and running depmod from hook
   echo "${_kernver}" |
     install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modules/${_extramodules}/version"
 
-  # remove build and source links
+  # remove build link
   rm "${pkgdir}"/usr/lib/modules/${_kernver}/build
 
   # now we call depmod...
@@ -137,22 +143,29 @@ _package() {
 _package-headers() {
   pkgdesc="Header files and scripts for building modules for linux kernel - ${_desc}"
   provides=("linux-headers=${pkgver}")
-  conflicts=('linux-rpi4-mainline-headers' 'linux-rpi4-rc-headers')
-  replaces=('linux-raspberrypi-latest-headers')
+  depends=('pahole')
+  conflicts=('linux-rpi4-headers' 'linux-rpi4-rc-headers')
 
   cd ${_srcname}
   local _builddir="${pkgdir}/usr/lib/modules/${_kernver}/build"
+  mkdir -p ${_builddir}/tools/bpf/bpftool
+  mkdir -p ${_builddir}/tools/bpf/resolve_btfids
 
   install -Dt "${_builddir}" -m644 Makefile .config Module.symvers
+  cp tools/bpf/bpftool/vmlinux.h ${_builddir}/tools/bpf/bpftool/vmlinux.h
   install -Dt "${_builddir}/kernel" -m644 kernel/Makefile
 
+  # required when DEBUG_INFO_BTF_MODULES is enabled
+  if [ -f tools/bpf/resolve_btfids/resolve_btfids ]; then
+      cp tools/bpf/resolve_btfids/resolve_btfids ${_builddir}/tools/bpf/resolve_btfids/resolve_btfids
+  fi
+  
   mkdir "${_builddir}/.tmp_versions"
 
   cp -t "${_builddir}" -a include scripts
 
   install -Dt "${_builddir}/arch/${KARCH}" -m644 arch/${KARCH}/Makefile
   install -Dt "${_builddir}/arch/${KARCH}/kernel" -m644 arch/${KARCH}/kernel/asm-offsets.s
-  # arch/$KARCH/kernel/module.lds
 
   cp -t "${_builddir}/arch/${KARCH}" -a arch/${KARCH}/include
 
