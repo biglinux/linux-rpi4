@@ -4,11 +4,11 @@
 # Maintainer: Ray Sherwin <slick517d@gmail.com>
 
 pkgbase=linux-rpi4
-_commit=26e9c58fd607444366f03009ad377fd85b470c2f
+_commit=604cca8d9e56f396b48cc1059133e17d1daf5c0d
 _srcname=linux-${_commit}
 _kernelname=${pkgbase#linux}
 _desc="Raspberry Pi 4 64-bit kernel"
-pkgver=6.12.11
+pkgver=6.12.12
 pkgrel=1
 arch=('aarch64')
 url="http://www.kernel.org/"
@@ -21,7 +21,7 @@ source=("https://github.com/raspberrypi/linux/archive/${_commit}.tar.gz"
         'config-diff-manjaro'
 )
 
-md5sums=('e6e9e8a1a93ec8885d07d46964aa1ba0'
+md5sums=('5692ba3d0cb264db19eebb064ac0b9e4'
          '38c88d6d573cef3309960a6162b7d3c7'
          '7f7ddadea6f4a7d3017380cb83b95b5e'
          'SKIP')
