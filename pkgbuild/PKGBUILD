@@ -4,11 +4,11 @@
 # Maintainer: Ray Sherwin <slick517d@gmail.com>
 
 pkgbase=linux-rpi4
-_commit=4421ed134f9f03351a4a26293a29f009b8fff725
+_commit=9c09b75242960117155712f41ce540df2e3cd63c
 _srcname=linux-${_commit}
 _kernelname=${pkgbase#linux}
 _desc="Raspberry Pi 4 64-bit kernel"
-pkgver=6.12.37
+pkgver=6.12.38
 pkgrel=1
 arch=('aarch64')
 url="http://www.kernel.org/"
@@ -19,11 +19,13 @@ source=("https://github.com/raspberrypi/linux/archive/${_commit}.tar.gz"
         'linux.preset'
         'logo_linux_clut224.ppm'
         'config-diff-manjaro'
+        'fix_bluetooth_l2cap_mtu_negotiation.patch'
 )
 
-md5sums=('db4b3fe39f156032dad430e7a7d856ef'
+md5sums=('509fa87a8cd293f2d8ecfe64a5bb1e7e'
          '38c88d6d573cef3309960a6162b7d3c7'
          '7f7ddadea6f4a7d3017380cb83b95b5e'
+         '117bd84d62283253ca63c7bb46740e02'
          'SKIP')
 
 prepare() {
@@ -42,6 +44,7 @@ prepare() {
 
   # Add Manjaro Mascot for cpu core count at boot
   cp ../logo_linux_clut224.ppm drivers/video/logo/
+  patch -Np1 < "../fix_bluetooth_l2cap_mtu_negotiation.patch"
 }
 
 build() {
